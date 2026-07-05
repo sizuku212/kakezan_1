@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掛け算練習｜数直線 & マスの個数</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFF8EC;
+    --card:#FFFFFF;
+    --ink:#2B2A33;
+    --cyan:#28C6D9;
+    --cyan-dark:#0FA3B5;
+    --coral:#FF7A5C;
+    --coral-dark:#E85F41;
+    --slate:#7C8AE0;
+    --slate-dark:#5D6DD0;
+    --ok:#2FB86A;
+    --bad:#EF5350;
+    --line:#D8CFC0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 90% 0%, #FFEFD8 0%, transparent 45%),
+      radial-gradient(circle at 5% 100%, #E7FBFD 0%, transparent 40%),
+      var(--paper);
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    padding:32px 16px 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{text-align:center;margin-bottom:26px;}
+  header h1{
+    font-family:'Fredoka',sans-serif;
+    font-size:28px;
+    margin:0 0 6px;
+    letter-spacing:.02em;
+  }
+  header p{margin:0;color:#8A8378;font-size:14px;}
+
+  .problem-card{
+    background:var(--card);
+    border-radius:28px;
+    padding:30px 20px 26px;
+    text-align:center;
+    box-shadow:0 10px 0 rgba(0,0,0,0.04), 0 2px 20px rgba(0,0,0,0.05);
+    margin-bottom:22px;
+    position:relative;
+  }
+  .problem-card .eyebrow{
+    font-size:12px;
+    letter-spacing:.14em;
+    color:var(--cyan-dark);
+    font-weight:800;
+    text-transform:uppercase;
+  }
+  .problem{
+    font-family:'Fredoka',sans-serif;
+    font-size:64px;
+    font-weight:700;
+    margin:6px 0 2px;
+    position:relative;
+    display:inline-block;
+  }
+  .problem svg.squiggle{
+    position:absolute;
+    left:-6%;
+    right:-6%;
+    bottom:-10px;
+    width:112%;
+    height:16px;
+  }
+
+  section.card{
+    background:var(--card);
+    border-radius:24px;
+    padding:22px 22px 24px;
+    margin-bottom:20px;
+    box-shadow:0 2px 16px rgba(0,0,0,0.05);
+  }
+  section.card h2{
+    font-family:'Fredoka',sans-serif;
+    font-size:16px;
+    margin:0 0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  section.card h2 .num{
+    background:var(--ink);
+    color:#fff;
+    width:22px;height:22px;border-radius:50%;
+    font-size:12px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+  }
+
+  /* ---------- number line ---------- */
+  .numberline-outer{
+    position:relative;
+    width:100%;
+    max-width:650px;
+    margin:34px auto 14px;
+    height:70px;
+  }
+  .zero-label{
+    position:absolute;
+    left:-6px; top:-26px;
+    font-weight:800;
+    font-family:'Fredoka',sans-serif;
+    font-size:14px;
+    color:#8A8378;
+  }
+  .track-line{
+    position:absolute;
+    top:34px; left:0; right:0;
+    height:4px;
+    background:var(--line);
+    border-radius:4px;
+  }
+  .track-fill{
+    position:absolute;
+    top:34px; left:0;
+    height:4px;
+    width:0;
+    background:var(--cyan);
+    border-radius:4px 0 0 4px;
+    pointer-events:none;
+  }
+  .tick0{
+    position:absolute;
+    left:0; top:24px;
+    width:2px; height:24px;
+    background:#8A8378;
+  }
+  .input-box{
+    position:absolute;
+    top:14px;
+    width:34px; height:34px;
+    transform:translateX(-50%);
+  }
+  .input-box .tick{
+    position:absolute;
+    left:50%; bottom:-14px;
+    width:2px; height:12px;
+    background:#8A8378;
+    transform:translateX(-50%);
+  }
+  .input-box input{
+    width:100%; height:100%;
+    text-align:center;
+    border:2px solid var(--ink);
+    border-radius:8px;
+    font-family:'Fredoka',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    background:#fff;
+    outline:none;
+  }
+  .input-box input:focus{border-color:var(--cyan-dark);}
+  .input-box .cap{
+    position:absolute;
+    top:-22px;left:50%;transform:translateX(-50%);
+    font-size:11px;color:#8A8378;font-weight:700;white-space:nowrap;
+  }
+  input[type=range].slider{
+    position:absolute;
+    top:16px; left:0;
+    width:650px;
+    -webkit-appearance:none;
+    appearance:none;
+    background:transparent;
+    margin:0;
+    height:34px;
+  }
+  input[type=range].slider::-webkit-slider-runnable-track{
+    height:4px; background:transparent;
+  }
+  input[type=range].slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:26px;height:34px;
+    margin-top:0px;
+    border-radius:50%;
+    background:var(--cyan);
+    border:3px solid var(--cyan-dark);
+    cursor:pointer;
+    box-shadow:0 2px 4px rgba(0,0,0,.2);
+  }
+  input[type=range].slider::-moz-range-track{height:4px;background:transparent;}
+  input[type=range].slider::-moz-range-thumb{
+    width:20px;height:28px;border-radius:50%;
+    background:var(--cyan); border:3px solid var(--cyan-dark);
+    cursor:pointer;
+  }
+  .slider-cap{
+    position:absolute;
+    top:-22px;
+    font-size:11px;color:#8A8378;font-weight:700;
+    transform:translateX(-50%);
+    white-space:nowrap;
+  }
+  .line-marker{
+    position:absolute;
+    top:-30px;
+    transform:translateX(-50%);
+    display:none;
+    text-align:center;
+    pointer-events:none;
+  }
+  .line-marker.show{display:block;}
+  .line-marker .tri{
+    width:0;height:0;
+    margin:0 auto;
+    border-left:7px solid transparent;
+    border-right:7px solid transparent;
+    border-top:9px solid var(--ok);
+  }
+  .line-marker .marklabel{
+    background:var(--ok);
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+    border-radius:6px;
+    padding:2px 6px;
+    white-space:nowrap;
+    margin-top:2px;
+  }
+  .line-marker .stem{
+    position:absolute;
+    left:50%; top:16px;
+    width:2px; height:34px;
+    background:var(--ok);
+    transform:translateX(-50%);
+    opacity:.6;
+  }
+
+  /* ---------- grid + copies ---------- */
+  .grid-section{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .grid3{
+    display:grid;
+    grid-template-columns:repeat(3,54px);
+    grid-template-rows:repeat(3,54px);
+    gap:0;
+    border:3px solid var(--ink);
+    border-radius:10px;
+    overflow:hidden;
+    flex:0 0 auto;
+  }
+  .grid3 .cell{
+    border:1px solid var(--ink);
+    cursor:pointer;
+    background:#fff;
+    transition:background .12s ease;
+  }
+  .grid3 .cell.active{background:var(--cyan);}
+  .grid3 .cell:hover{background:#EAFBFD;}
+  .grid3 .cell.active:hover{background:var(--cyan-dark);}
+  .grid-caption{
+    text-align:center;font-size:12px;color:#8A8378;font-weight:700;margin-top:8px;
+  }
+
+  .copies-panel{flex:1 1 220px; min-width:220px;}
+  .copies-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    min-height:70px;
+    align-items:center;
+    padding:10px;
+    border:2px dashed var(--line);
+    border-radius:14px;
+    margin-bottom:12px;
+  }
+  .mini3{
+    display:grid;
+    grid-template-columns:repeat(3,10px);
+    grid-template-rows:repeat(3,10px);
+    gap:1px;
+  }
+  .mini3 .mcell{
+    background:transparent;
+    border:1px solid #E3DCCE;
+    border-radius:1px;
+  }
+  .mini3 .mcell.on{background:var(--cyan); border-color:var(--cyan-dark);}
+  .copies-controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+  }
+  .copies-controls .count{
+    font-family:'Fredoka',sans-serif;
+    font-size:20px;
+    min-width:44px;
+    text-align:center;
+  }
+  .pillbtn{
+    border:none;
+    border-radius:999px;
+    padding:10px 18px;
+    font-weight:800;
+    font-family:'Nunito',sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    color:#fff;
+    transition:transform .08s ease, filter .12s ease;
+  }
+  .pillbtn:active{transform:scale(.94);}
+  .pillbtn:disabled{opacity:.4; cursor:not-allowed;}
+  .pillbtn.decrease{background:var(--slate);}
+  .pillbtn.decrease:hover:not(:disabled){background:var(--slate-dark);}
+  .pillbtn.increase{background:var(--coral);}
+  .pillbtn.increase:hover:not(:disabled){background:var(--coral-dark);}
+
+  /* ---------- footer / results ---------- */
+  .actions{
+    display:flex;
+    justify-content:center;
+    margin-top:8px;
+  }
+  .answer-btn{
+    background:var(--ok);
+    color:#fff;
+    border:none;
+    font-family:'Fredoka',sans-serif;
+    font-size:18px;
+    font-weight:600;
+    padding:14px 46px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 6px 0 #1E8A4E;
+    transition:transform .08s ease;
+  }
+  .answer-btn:active{transform:translateY(4px); box-shadow:0 2px 0 #1E8A4E;}
+
+  .results{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .result-tile{
+    border-radius:16px;
+    padding:14px 12px;
+    text-align:center;
+    font-weight:800;
+    font-size:14px;
+    border:2px solid transparent;
+  }
+  .result-tile.pending{background:#F4F1EA; color:#A79E8E;}
+  .result-tile.ok{background:#E7F9EE; color:var(--ok); border-color:var(--ok);}
+  .result-tile.bad{background:#FDECEC; color:var(--bad); border-color:var(--bad);}
+  .result-tile .big{display:block; font-size:22px; margin-bottom:2px;}
+  .result-tile .hint{
+    display:block;
+    margin-top:6px;
+    font-size:12px;
+    font-weight:700;
+    color:#B5482F;
+    line-height:1.5;
+  }
+
+  .reveal-grid{
+    display:none;
+    margin-top:14px;
+    padding:12px;
+    border-radius:14px;
+    background:#FFF3EE;
+    border:2px dashed var(--coral);
+  }
+  .reveal-grid.show{display:block;}
+  .reveal-grid .title{
+    font-size:11px;
+    font-weight:800;
+    color:var(--coral-dark);
+    margin-bottom:8px;
+  }
+  .reveal-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+  }
+  .reveal-row .label{font-size:12px; font-weight:800; color:#8A8378;}
+  .reveal-sq{
+    width:16px;height:16px;
+    background:var(--cyan);
+    border:1px solid var(--cyan-dark);
+    border-radius:3px;
+    display:inline-block;
+  }
+
+  .next-wrap{text-align:center; margin-top:18px;}
+  .next-btn{
+    background:none;
+    border:2px solid var(--ink);
+    color:var(--ink);
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    padding:10px 26px;
+    border-radius:999px;
+    cursor:pointer;
+    display:none;
+  }
+  .next-btn.show{display:inline-block;}
+  .next-btn:hover{background:var(--ink); color:#fff;}
+
+  @media (max-width:700px){
+    input[type=range].slider{width:100%;}
+    .numberline-outer{max-width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>掛け算練習</h1>
+    <p>数直線とマスの個数、両方で答えよう</p>
+  </header>
+
+  <div class="problem-card">
+    <div class="eyebrow">問題</div>
+    <div class="problem" id="problemText">
+      ? × ?
+      <svg class="squiggle" viewBox="0 0 300 16" preserveAspectRatio="none">
+        <path d="M0,8 Q15,0 30,8 T60,8 T90,8 T120,8 T150,8 T180,8 T210,8 T240,8 T270,8 T300,8"
+              fill="none" stroke="#FF7A5C" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2><span class="num">1</span>数直線で表そう</h2>
+    <div class="numberline-outer" id="numberlineOuter">
+      <div class="zero-label">0</div>
+      <div class="tick0"></div>
+      <div class="track-line"></div>
+      <div class="track-fill" id="trackFill"></div>
+      <input type="range" class="slider" id="slider" min="0" max="650" value="0" step="1">
+      <div class="input-box" id="inputBox">
+        <div class="cap">数を入力</div>
+        <input type="text" inputmode="numeric" maxlength="1" id="numInput" placeholder="?">
+        <div class="tick"></div>
+      </div>
+      <div class="line-marker" id="lineMarker">
+        <div class="stem"></div>
+        <div class="tri"></div>
+        <div class="marklabel" id="lineMarkerLabel"></div>
+      </div>
+    </div>
+    <div class="grid-caption">数を入力して、スライダーを動かそう</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">2</span>マスの個数で表そう</h2>
+    <div class="grid-section">
+      <div>
+        <div class="grid3" id="grid3"></div>
+        <div class="grid-caption">押した部分が青くなる</div>
+      </div>
+      <div class="copies-panel">
+        <div class="copies-row" id="copiesRow"></div>
+        <div class="copies-controls">
+          <button class="pillbtn decrease" id="decreaseBtn">減らす</button>
+          <div class="count" id="copyCountLabel">1</div>
+          <button class="pillbtn increase" id="increaseBtn">増やす</button>
+        </div>
+        <div class="grid-caption" style="margin-top:10px;">表示されているコピーの数</div>
+        <div class="reveal-grid" id="gridReveal">
+          <div class="title">正解例</div>
+          <div class="reveal-row">
+            <span class="label" id="revealPressLabel"></span>
+            <span id="revealPressIcons"></span>
+          </div>
+          <div class="reveal-row">
+            <span class="label" id="revealCopyLabel"></span>
+            <span id="revealCopyIcons"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="answer-btn" id="answerBtn">解答する</button>
+  </div>
+
+  <div class="results">
+    <div class="result-tile pending" id="lineResult">
+      <span class="big">🔢</span>数直線：未回答
+    </div>
+    <div class="result-tile pending" id="gridResult">
+      <span class="big">🟦</span>マスの個数：未回答
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="next-btn" id="nextBtn">次の問題へ →</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const LINE_MAX = 650;
+  const BOX_DIST = 70;      // fixed pixel position of the input box, from 0
+  const TOLERANCE = 100;    // allowed pixel error on the slider position
+  const MIN_COPIES = 1;
+  const MAX_COPIES = 9;
+
+  let factor1, factor2;
+  let copyCount = 1;
+  let answered = false;
+
+  const problemText = document.getElementById('problemText');
+  const numInput = document.getElementById('numInput');
+  const inputBox = document.getElementById('inputBox');
+  const slider = document.getElementById('slider');
+  const trackFill = document.getElementById('trackFill');
+  const grid3 = document.getElementById('grid3');
+  const copiesRow = document.getElementById('copiesRow');
+  const copyCountLabel = document.getElementById('copyCountLabel');
+  const decreaseBtn = document.getElementById('decreaseBtn');
+  const increaseBtn = document.getElementById('increaseBtn');
+  const answerBtn = document.getElementById('answerBtn');
+  const lineResult = document.getElementById('lineResult');
+  const gridResult = document.getElementById('gridResult');
+  const nextBtn = document.getElementById('nextBtn');
+  const lineMarker = document.getElementById('lineMarker');
+  const lineMarkerLabel = document.getElementById('lineMarkerLabel');
+  const gridReveal = document.getElementById('gridReveal');
+  const revealPressLabel = document.getElementById('revealPressLabel');
+  const revealPressIcons = document.getElementById('revealPressIcons');
+  const revealCopyLabel = document.getElementById('revealCopyLabel');
+  const revealCopyIcons = document.getElementById('revealCopyIcons');
+
+  let cells = []; // 9 booleans
+
+  function randInt1to9(){ return 1 + Math.floor(Math.random()*9); }
+
+  function updateTrackFill(){
+    trackFill.style.width = slider.value + 'px';
+  }
+  slider.addEventListener('input', updateTrackFill);
+
+  function newProblem(){
+    factor1 = randInt1to9();
+    factor2 = randInt1to9();
+    problemText.childNodes[0].nodeValue = factor1 + ' × ' + factor2;
+
+    // reset number line
+    numInput.value = '';
+    slider.value = 0;
+    numInput.disabled = false;
+    slider.disabled = false;
+    updateTrackFill();
+
+    // reset grid
+    cells = new Array(9).fill(false);
+    renderGrid();
+
+    // reset copies
+    copyCount = 1;
+    copyCountLabel.textContent = copyCount;
+    renderCopies();
+
+    // reset UI state
+    answered = false;
+    answerBtn.disabled = false;
+    nextBtn.classList.remove('show');
+    setTilePending(lineResult, '🔢', '数直線：未回答');
+    setTilePending(gridResult, '🟦', 'マスの個数：未回答');
+
+    // hide any previous answer reveals
+    lineMarker.classList.remove('show');
+    gridReveal.classList.remove('show');
+
+    // position the fixed input box visually
+    inputBox.style.left = BOX_DIST + 'px';
+  }
+
+  function renderGrid(){
+    grid3.innerHTML = '';
+    for(let i=0;i<9;i++){
+      const div = document.createElement('div');
+      div.className = 'cell' + (cells[i] ? ' active' : '');
+      div.addEventListener('click', () => {
+        if(answered) return;
+        cells[i] = !cells[i];
+        renderGrid();
+        renderCopies();
+      });
+      grid3.appendChild(div);
+    }
+  }
+
+  function renderCopies(){
+    copiesRow.innerHTML = '';
+    for(let c=0;c<copyCount;c++){
+      const mini = document.createElement('div');
+      mini.className = 'mini3';
+      for(let i=0;i<9;i++){
+        const m = document.createElement('div');
+        m.className = 'mcell' + (cells[i] ? ' on' : '');
+        mini.appendChild(m);
+      }
+      copiesRow.appendChild(mini);
+    }
+  }
+
+  decreaseBtn.addEventListener('click', () => {
+    if(answered) return;
+    if(copyCount > MIN_COPIES){
+      copyCount--;
+      copyCountLabel.textContent = copyCount;
+      renderCopies();
+    }
+  });
+  increaseBtn.addEventListener('click', () => {
+    if(answered) return;
+    if(copyCount < MAX_COPIES){
+      copyCount++;
+      copyCountLabel.textContent = copyCount;
+      renderCopies();
+    }
+  });
+
+  numInput.addEventListener('input', () => {
+    numInput.value = numInput.value.replace(/[^0-9]/g,'').slice(0,1);
+  });
+
+  function setTilePending(el, icon, text){
+    el.className = 'result-tile pending';
+    el.innerHTML = '<span class="big">'+icon+'</span>'+text;
+  }
+  function setTileResult(el, ok, label, hint){
+    el.className = 'result-tile ' + (ok ? 'ok' : 'bad');
+    el.innerHTML = '<span class="big">'+(ok?'⭕':'❌')+'</span>'+label
+      + (hint ? '<span class="hint">'+hint+'</span>' : '');
+  }
+
+  function iconsHTML(n){
+    let html = '';
+    for(let i=0;i<n;i++){ html += '<span class="reveal-sq"></span>'; }
+    return html;
+  }
+
+  // returns the "other" factor if the given count matches factor1 or factor2, else null
+  function otherFactor(count, f1, f2){
+    if(count === f1 && count === f2) return f1;
+    if(count === f1) return f2;
+    if(count === f2) return f1;
+    return null;
+  }
+
+  function checkAnswer(){
+    if(answered) return;
+    answered = true;
+    answerBtn.disabled = true;
+    numInput.disabled = true;
+    slider.disabled = true;
+
+    // ---- number line check ----
+    const typed = parseInt(numInput.value, 10);
+    const actualSliderPx = parseInt(slider.value, 10);
+    let typedValid = false;
+    let typedOther = null;
+    if(!isNaN(typed)){
+      typedOther = otherFactor(typed, factor1, factor2);
+      typedValid = typedOther !== null;
+    }
+    // Reference values used to draw the correct marker:
+    // if the typed number is correct, align to it; otherwise fall back to a canonical example.
+    const refInput = typedValid ? typed : factor1;
+    const refOther = typedValid ? typedOther : factor2;
+    const expectedSliderPx = BOX_DIST * refOther;
+
+    const lineOk = typedValid && Math.abs(actualSliderPx - expectedSliderPx) <= TOLERANCE;
+
+    // Always display the exact correct slider position, correct or not.
+    lineMarker.style.left = expectedSliderPx + 'px';
+    lineMarkerLabel.textContent = refInput + '×' + refOther;
+    lineMarker.classList.add('show');
+
+    let lineHint;
+    if(lineOk){
+      lineHint = '正解の位置は図の通りです。';
+    }else if(typedValid){
+      lineHint = '入力欄は正しい数です。スライダーを図の位置（'+refInput+'×'+refOther+'）に合わせましょう。';
+    }else{
+      lineHint = '正解例：入力欄に <b>'+refInput+'</b>、スライダーは <b>'+refInput+'×'+refOther+'</b> の位置へ（逆の '+refOther+'×'+refInput+' でも可）';
+    }
+    setTileResult(lineResult, lineOk, '数直線：' + (lineOk ? '正解！' : '不正解'), lineHint);
+
+    // ---- grid check ----
+    const pressedCount = cells.filter(Boolean).length;
+    const otherG = otherFactor(pressedCount, factor1, factor2);
+    const gridOk = (otherG !== null) && (copyCount === otherG);
+
+    let gridHint = null;
+    if(!gridOk){
+      gridHint = '下の例を確認しましょう（逆でも可）';
+      revealPressLabel.textContent = 'マス：' + factor1 + '個押す →';
+      revealPressIcons.innerHTML = iconsHTML(factor1);
+      revealCopyLabel.textContent = 'コピー：' + factor2 + '個に →';
+      revealCopyIcons.innerHTML = iconsHTML(factor2);
+      gridReveal.classList.add('show');
+    }
+    setTileResult(gridResult, gridOk, 'マスの個数：' + (gridOk ? '正解！' : '不正解'), gridHint);
+
+    nextBtn.classList.add('show');
+  }
+
+  answerBtn.addEventListener('click', checkAnswer);
+  nextBtn.addEventListener('click', newProblem);
+
+  newProblem();
+})();
+</script>
+</body>
+</html>
